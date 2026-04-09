@@ -10,7 +10,7 @@ Skills are invoked with `/skill-name` in Claude Code. They give the agent full c
 
 | Skill | Trigger | What it does |
 |---|---|---|
-| `/twilight-trader` | "open a trade", "check balance", "fund account" | Full CLI reference for the `relayer-cli` — wallet management, ZkOS account funding, opening/closing leveraged positions, market data, portfolio tracking |
+| `/twilight-trader` | "open a trade", "check balance", "fund account", "estimated funding rate" | Full CLI reference for the `relayer-cli` — wallet management, BTC onboarding, ZkOS account funding, opening/closing leveraged positions, market data, portfolio tracking, estimated funding rate |
 | `/twilight-strategies` | "show strategies", "best hedging strategy", "funding arb" | Query the Twilight Strategy API for live trading strategies with real-time P&L calculations across Twilight, Binance, and Bybit |
 
 ### Strategy API
@@ -53,23 +53,26 @@ curl -H "x-api-key: 123hEll@he" http://134.199.214.129:3000/api/market
 
 ## Relayer CLI Quick Reference
 
-The `relayer-cli` binary from [nyks-wallet](https://github.com/twilight-project/nyks-wallet) handles all on-chain operations.
+The `relayer-cli` binary from [nyks-wallet v0.1.0-relayer-cli](https://github.com/twilight-project/nyks-wallet/releases/tag/v0.1.0-relayer-cli) handles all on-chain operations.
 
 ```bash
 # Create wallet
-relayer-cli wallet create --wallet-id my-wallet --password secret
+relayer-cli wallet create --wallet-id my-wallet
 
 # Fund ZkOS trading account
 relayer-cli zkaccount fund --amount 5000
 
-# Open 5x long (returns instantly with --no-wait)
-relayer-cli order open-trade --account-index 0 --side long --entry-price 66700 --leverage 5 --no-wait
+# Open 5x long
+relayer-cli order open-trade --account-index 0 --side LONG --entry-price 66700 --leverage 5
 
 # Close trade
-relayer-cli order close-trade --account-index 0 --no-wait
+relayer-cli order close-trade --account-index 0
+
+# Unlock account after settlement (required before reuse)
+relayer-cli order unlock-close-order --account-index 0
 
 # Rotate account for next trade
-relayer-cli zkaccount transfer --from 0
+relayer-cli zkaccount transfer --account-index 0
 
 # Send tokens to another address
 relayer-cli wallet send --to twilight1abc... --amount 5000 --denom sats
@@ -92,14 +95,15 @@ relayer-cli market market-stats
 
 ## Key Concepts
 
-- **0% fees, 0% funding** on Twilight — every strategy exploits this vs Binance/Bybit
 - **Inverse perpetuals**: margin in BTC (sats), PnL in sats
+- **Fees**: chain transactions are zero-fee; exchange operations carry fill and settlement fees
+- **Funding**: applied every **1 hour** (vs 8h on Binance/Bybit) — use `/twilight-trader` to estimate the next rate
 - **ZkOS accounts**: privacy-preserving, two states — Coin (idle) / Memo (order active)
-- **Account rotation**: must rotate after settling a trade before opening a new one
+- **Account rotation**: after closing a trade, run `unlock-close-order` then `zkaccount transfer` before opening a new one
 - **Max leverage**: 50x, max position: 20% of pool equity
 
 ## Related Repos
 
-- [nyks-wallet](https://github.com/twilight-project/nyks-wallet) — Rust SDK + CLI for trading
+- [nyks-wallet](https://github.com/twilight-project/nyks-wallet/releases/tag/v0.1.0-relayer-cli) — Rust SDK + CLI for trading (v0.1.0-relayer-cli)
 - [twilight-pool](https://github.com/kenny019/twilight-pool) — Frontend (Next.js)
 - [twilight-strategy-tester](https://github.com/runnerelectrode/twilight-strategy-tester) — Strategy visualizer with live Binance/Bybit feeds

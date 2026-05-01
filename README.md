@@ -17,20 +17,20 @@ Skills are invoked with `/skill-name` in Claude Code. They give the agent full c
 
 Live strategy calculations powered by real-time WebSocket feeds from Binance and Bybit.
 
-**Base URL**: `http://134.199.214.129:3000`
+**Base URL**: `https://strategy.lunarpunk.xyz`
 **Auth**: `x-api-key: 123hEll@he`
 
 ```bash
 # Get top 5 profitable strategies
-curl -H "x-api-key: 123hEll@he" "http://134.199.214.129:3000/api/strategies?profitable=true&limit=5"
+curl -H "x-api-key: 123hEll@he" "https://strategy.lunarpunk.xyz/api/strategies?profitable=true&limit=5"
 
 # Run a custom delta-neutral strategy
 curl -X POST -H "x-api-key: 123hEll@he" -H "Content-Type: application/json" \
   -d '{"twilightPosition":"SHORT","twilightSize":200,"twilightLeverage":10,"binancePosition":"LONG","binanceSize":200,"binanceLeverage":10}' \
-  http://134.199.214.129:3000/api/strategies/run
+  https://strategy.lunarpunk.xyz/api/strategies/run
 
 # Get live market data
-curl -H "x-api-key: 123hEll@he" http://134.199.214.129:3000/api/market
+curl -H "x-api-key: 123hEll@he" https://strategy.lunarpunk.xyz/api/market
 ```
 
 | Endpoint | Method | Auth | Description |
@@ -90,7 +90,7 @@ relayer-cli market market-stats
 | RPC | `https://rpc.twilight.org` |
 | ZkOS Server | `https://zkserver.twilight.org` |
 | Relayer API | `https://api.ephemeral.fi/api` |
-| Strategy API | `http://134.199.214.129:3000` |
+| Strategy API | `https://strategy.lunarpunk.xyz` |
 | Explorer | `https://explorer.twilight.org` |
 
 ## Key Concepts
